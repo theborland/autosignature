@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f5f6f2" />
+    <meta name="description" content="Sign PDF documents privately in your browser." />
+    <title>PDF Signature Tool</title>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="./" aria-label="PDF Signature Tool home">
+          <span class="brand-mark" aria-hidden="true">PS</span>
+          <span>PDF Signature Tool</span>
+        </a>
+        <button class="button button-quiet settings-trigger" id="settings-button" type="button">
+          <span class="gear" aria-hidden="true">⚙</span> Signature Settings
+        </button>
+      </header>
+
+      <main>
+        <section class="intro" aria-labelledby="page-title">
+          <p class="eyebrow">PRIVATE BY DESIGN <span></span> NO UPLOADS</p>
+          <h1 id="page-title">A signature, on every page.</h1>
+          <p class="intro-copy">Add your saved signature to PDFs right here in your browser.</p>
+          <div class="ready-line" id="signature-status" role="status">
+            <span class="status-dot"></span><span>Checking signature…</span>
+          </div>
+        </section>
+
+        <section class="workspace" aria-label="Sign PDF documents">
+          <div class="section-heading">
+            <div>
+                <p class="step-label">ONE DOCUMENT AT A TIME</p>
+                <h2>Add a PDF</h2>
+            </div>
+              <span class="file-count" id="file-count">No PDF selected</span>
+          </div>
+
+          <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Choose or drop PDF files">
+            <input id="pdf-input" type="file" accept="application/pdf,.pdf" hidden />
+            <div class="drop-icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48" fill="none"><path d="M14 5.75h13l9 9v25.5a2 2 0 0 1-2 2H14a2 2 0 0 1-2-2v-32.5a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.8"/><path d="M26.5 6.5v9h9M24 22v12m0 0-4.5-4.5M24 34l4.5-4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="drop-copy">
+              <strong>Drop one PDF here</strong>
+              <span>or <button class="text-button" id="select-pdfs" type="button">choose a PDF</button> from your computer</span>
+            </div>
+            <span class="file-type">PDF files · processed on this device</span>
+          </div>
+
+          <div class="file-list" id="file-list" aria-live="polite"></div>
+
+          <div class="actions-row">
+            <p class="privacy-note"><span aria-hidden="true">▣</span> Your documents never leave this browser.</p>
+            <button class="button button-quiet" id="fix-placement-button" type="button">
+              <span aria-hidden="true">↗</span> Fix placement
+            </button>
+          </div>
+
+          <div class="progress-region" id="progress-region" hidden>
+            <div class="progress-label"><span id="progress-message">Preparing…</span><span id="progress-count"></span></div>
+            <div class="progress-track"><span id="progress-fill"></span></div>
+          </div>
+          <div class="result-message" id="result-message" role="status" hidden></div>
+          <div class="download-row" id="download-row" hidden>
+            <span id="download-summary"></span>
+            <button class="button button-primary" id="download-button" type="button">Download signed PDF <span aria-hidden="true">↓</span></button>
+          </div>
+        </section>
+
+        <aside class="notice-band">
+          <span class="notice-icon" aria-hidden="true">i</span>
+          <p>Placement is applied in the same relative position on every page. Please check the preview, especially when documents have different layouts.</p>
+        </aside>
+
+        <footer class="privacy-footer">
+          <div><span class="lock-icon" aria-hidden="true">▣</span><strong>Private on this device</strong><span>Signatures are saved only in this browser profile.</span></div>
+          <button class="link-button" id="forget-button" type="button" hidden>Forget signature</button>
+        </footer>
+        <p class="disclaimer">This creates a visible signature image, not a certificate-based digital signature or identity verification.</p>
+      </main>
+    </div>
+
+    <dialog class="modal" id="setup-dialog" aria-labelledby="setup-title">
+      <form method="dialog" class="modal-close-form"><button class="icon-button" aria-label="Close settings" value="close">×</button></form>
+      <div class="modal-content">
+        <p class="eyebrow">SIGNATURE SETTINGS</p>
+        <h2 id="setup-title">Set up your signature</h2>
+        <p class="modal-lede">Your signature stays in this browser on this device. On shared computers, use a separate operating-system or browser account.</p>
+        <label class="field-label" for="signature-input">1. Upload signature (PNG)</label>
+        <label class="upload-control" for="signature-input"><span class="upload-symbol">＋</span><span id="signature-file-label">Choose a PNG signature</span><span class="upload-hint">PNG only</span></label>
+        <input id="signature-input" type="file" accept="image/png,.png" hidden />
+        <label class="field-label sample-label" for="sample-input">2. Add a sample PDF to position it</label>
+        <label class="upload-control" for="sample-input"><span class="upload-symbol">＋</span><span id="sample-file-label">Choose a representative PDF</span><span class="upload-hint">PDF</span></label>
+        <input id="sample-input" type="file" accept="application/pdf,.pdf" hidden />
+        <p class="setup-hint">Drag the signature on the preview to place it. Use the corner handle to resize. This placement will be used on every page.</p>
+        <div class="setup-preview" id="setup-preview" hidden>
+          <div class="preview-toolbar"><span>POSITION PREVIEW</span><span id="setup-page-size"></span></div>
+          <div class="preview-stage" id="setup-stage"><canvas id="setup-canvas"></canvas><div class="signature-overlay" id="setup-overlay" hidden><img id="setup-signature-image" alt="Signature preview" /><span class="resize-handle" aria-hidden="true"></span></div></div>
+        </div>
+        <p class="dialog-error" id="setup-error" role="alert" hidden></p>
+        <div class="modal-actions"><button class="button button-quiet" id="cancel-setup" type="button">Cancel</button><button class="button button-primary" id="save-settings" type="button" disabled>Save signature</button></div>
+      </div>
+    </dialog>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
